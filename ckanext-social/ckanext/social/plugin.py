@@ -15,11 +15,11 @@ class SocialPlugin(plugins.SingletonPlugin):
 
     def get_helpers(self):
         """
-        All functions, not starting with __ in the ckanext.social.lib
+        All functions, not starting with __ in the ckanext.social.helpers
         module will be loaded and made available as helpers to the
         templates.
         """
-        from ckanext.social.lib import helpers
+        from ckanext.social.helpers import helpers
         from inspect import getmembers, isfunction
 
         helper_dict = {}
