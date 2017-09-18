@@ -20,6 +20,6 @@ $ cd ckanext-social
 $ python setup.py develop
 ```
 
-Modify your configuration file (generally in /etc/ckan/default/production.ini) and add datarequests in the ckan.plugins property.
+Modify your configuration file (generally in /etc/ckan/default/production.ini) and add social in the ckan.plugins property.
 
 `ckan.plugins = social <OTHER_PLUGINS>  `
