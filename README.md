@@ -1,5 +1,6 @@
 # CKAN social
-An extension to improve social sharing in CKAN.
+
+_An extension to improve social sharing in CKAN._
 
 With the extension installed and activated:
 
