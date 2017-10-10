@@ -29,6 +29,7 @@ class TestSelenium(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        # reset_db()
         env = os.environ.copy()
         env['DEBUG'] = 'True'
         env['OAUTHLIB_INSECURE_TRANSPORT'] = 'True'
@@ -36,12 +37,13 @@ class TestSelenium(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        child = pexpect.spawn('paster', ['--plugin=ckan', 'dataset', 'purge', '01', '-c', '/etc/ckan/default/production.ini'])
+        child.expect('01 purged')
+        child = pexpect.spawn('paster', ['--plugin=ckan', 'dataset', 'purge', '02', '-c', '/etc/ckan/default/production.ini'])
+        child.expect('02 purged')
         cls._process.terminate()
 
     def setUp(self):
-
-        # reset_db()
-
         if 'WEB_DRIVER_URL' in os.environ and 'CKAN_SERVER_URL' in os.environ:
             self.driver = webdriver.Remote(os.environ['WEB_DRIVER_URL'], webdriver.DesiredCapabilities.FIREFOX.copy())
             self.base_url = os.environ['CKAN_SERVER_URL']
@@ -132,10 +134,11 @@ class TestSelenium(unittest.TestCase):
         self.register()
         self.login('selenium_admin', 'selenium')
 
-        self.create_dataset('23', 'description', '23',
+        self.create_organization('testorg', 'test')
+        self.create_dataset('01', 'description', '01',
                             'resource_name', 'resource_description', 'html')
 
-        self.driver.get(self.base_url + 'dataset/23')
+        self.driver.get(self.base_url + 'dataset/01')
         actions = ActionChains(self.driver)
         twitter = self.driver.find_element_by_link_text('Twitter')
         actions.key_down(Keys.COMMAND).click(twitter).key_up(Keys.COMMAND).perform()
@@ -145,7 +148,7 @@ class TestSelenium(unittest.TestCase):
         bla = self.driver.find_element_by_id('status')
 
         assert "Check out " in bla.text
-        assert "23" in bla.text
+        assert "01" in bla.text
         assert "description" in bla.text
 
     def test_resource_title_in_share_text_twitter(self):
@@ -153,10 +156,11 @@ class TestSelenium(unittest.TestCase):
         self.register()
         self.login('selenium_admin', 'selenium')
 
-        self.create_dataset('27', 'description', '27',
+        self.create_organization('testorg', 'test')
+        self.create_dataset('02', 'description', '02',
                             'resource_name', 'resource_description', 'html')
 
-        self.driver.get(self.base_url + 'dataset/27')
+        self.driver.get(self.base_url + 'dataset/02')
         self.driver.find_element_by_xpath("//a[@title='resource_name']").click()
         twitter = self.driver.find_element_by_link_text('Twitter')
         actions = ActionChains(self.driver)
