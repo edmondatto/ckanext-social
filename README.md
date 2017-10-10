@@ -70,3 +70,12 @@ cd ckanext-social
 python setup.py develop
 pip install -r dev-requirements.txt
 ```
+
+### Tests
+
+This sofware contains a set of test to detect errors and failures. You can run this tests by running the following command (this command will generate coverage reports):
+
+```commandline
+python setup.py nosetests
+```
+Note: The test.ini file contains a link to the CKAN test-core.ini file. You will need to change that link to the real path of the file in your system (generally /usr/local/lib/ckan/default/src/ckan/test-core.ini).
