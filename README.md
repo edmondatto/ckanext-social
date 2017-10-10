@@ -47,8 +47,10 @@ Modify your configuration file (generally in `/etc/ckan/default/production.ini`)
 
 #### Option 2: Install the extension using `pip install ckanext-social`
 1. Install the ckanext-social Python package into your virtual environment:
+```commandline
+pip install ckanext-social
+```
 
-     pip install ckanext-social
 
 2. Add ``social`` to the ``ckan.plugins`` setting in your CKAN
    config file (by default the config file is located at
