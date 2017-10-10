@@ -5,7 +5,7 @@
 # modify it under the terms of the GNU Affero General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# CKAN Data Requests Extension is distributed in the hope that it will be useful,
+# CKAN Social Extension is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
@@ -16,13 +16,17 @@
 import os
 import unittest
 from subprocess import Popen
+
+import ckan.model as model
 import pexpect
+from ckan.tests.helpers import reset_db
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
 
 
 class TestSelenium(unittest.TestCase):
+
     @classmethod
     def setUpClass(cls):
         env = os.environ.copy()
@@ -35,14 +39,21 @@ class TestSelenium(unittest.TestCase):
         cls._process.terminate()
 
     def setUp(self):
+
+        # reset_db()
+
         if 'WEB_DRIVER_URL' in os.environ and 'CKAN_SERVER_URL' in os.environ:
             self.driver = webdriver.Remote(os.environ['WEB_DRIVER_URL'], webdriver.DesiredCapabilities.FIREFOX.copy())
             self.base_url = os.environ['CKAN_SERVER_URL']
         else:
             self.driver = webdriver.Chrome()
             self.base_url = 'http://127.0.0.1:5000/'
+
         self.driver.implicitly_wait(5)
         self.driver.set_window_size(1024, 768)
+
+    def tearDown(self):
+        self.driver.quit()
 
     def logout(self):
         self.driver.delete_all_cookies()
@@ -61,8 +72,9 @@ class TestSelenium(unittest.TestCase):
             child.sendline(cls.sysadmin_pwd)
             child.expect('Added .+ as sysadmin')
         except pexpect.EOF:
-            # Sysadmin already exists
+            # Sysadmin probably exists already
             pass
+
         cls.logout()
 
     def login(self, username, password):
@@ -92,6 +104,7 @@ class TestSelenium(unittest.TestCase):
         driver.get(self.base_url)
         driver.find_element_by_link_text('Datasets').click()
         driver.find_element_by_link_text('Add Dataset').click()
+
         # FIRST PAGE: Dataset properties
         driver.find_element_by_id('field-title').clear()
         driver.find_element_by_id('field-title').send_keys(name)
@@ -115,13 +128,14 @@ class TestSelenium(unittest.TestCase):
         driver.find_element_by_css_selector('button.btn.btn-primary').click()
 
     def test_dataset_description_in_share_text_twitter(self):
+
         self.register()
         self.login('selenium_admin', 'selenium')
 
-        self.create_dataset('this_dataset', 'description', 'this_dataset',
+        self.create_dataset('23', 'description', '23',
                             'resource_name', 'resource_description', 'html')
 
-        self.driver.get(self.base_url + 'dataset/this_dataset')
+        self.driver.get(self.base_url + 'dataset/23')
         actions = ActionChains(self.driver)
         twitter = self.driver.find_element_by_link_text('Twitter')
         actions.key_down(Keys.COMMAND).click(twitter).key_up(Keys.COMMAND).perform()
@@ -131,8 +145,29 @@ class TestSelenium(unittest.TestCase):
         bla = self.driver.find_element_by_id('status')
 
         assert "Check out " in bla.text
-        assert "15" in bla.text
+        assert "23" in bla.text
         assert "description" in bla.text
+
+    def test_resource_title_in_share_text_twitter(self):
+
+        self.register()
+        self.login('selenium_admin', 'selenium')
+
+        self.create_dataset('27', 'description', '27',
+                            'resource_name', 'resource_description', 'html')
+
+        self.driver.get(self.base_url + 'dataset/27')
+        self.driver.find_element_by_xpath("//a[@title='resource_name']").click()
+        twitter = self.driver.find_element_by_link_text('Twitter')
+        actions = ActionChains(self.driver)
+        actions.key_down(Keys.COMMAND).click(twitter).key_up(Keys.COMMAND).perform()
+        self.driver.switch_to.window(self.driver.window_handles[-1])
+
+        assert 'Share a link' in self.driver.title
+        bla = self.driver.find_element_by_id('status')
+
+        assert "Check out \"this great resource" in bla.text
+        assert "resource_name" in bla.text
 
 
 if __name__ == '__main__':
