@@ -1,25 +1,11 @@
-# -*- coding: utf-8 -*-
-# Copyright (c) 2016 CoNWeT Lab., Universidad Politécnica de Madrid
-# This file is part of CKAN Data Requests Extension.
-# CKAN Data Requests Extension is free software: you can redistribute it and/or
-# modify it under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-# CKAN Social Extension is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Affero General Public License for more details.
-# You should have received a copy of the GNU Affero General Public License
-# along with CKAN Data Requests Extension.  If not, see <http://www.gnu.org/licenses/>.
-
-
 import os
 import unittest
 from subprocess import Popen
 
-import ckan.model as model
+import ckan.logic as logic
 import pexpect
-from ckan.tests.helpers import reset_db
+from ckan.config.environment import load_environment
+from paste.deploy import appconfig
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
@@ -29,7 +15,8 @@ class TestSelenium(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        # reset_db()
+        conf = appconfig('config:/etc/ckan/default/production.ini', relative_to='.')
+        load_environment(conf.global_conf, conf.local_conf)
         env = os.environ.copy()
         env['DEBUG'] = 'True'
         env['OAUTHLIB_INSECURE_TRANSPORT'] = 'True'
@@ -41,6 +28,7 @@ class TestSelenium(unittest.TestCase):
         child.expect('01 purged')
         child = pexpect.spawn('paster', ['--plugin=ckan', 'dataset', 'purge', '02', '-c', '/etc/ckan/default/production.ini'])
         child.expect('02 purged')
+        logic.get_action('organization_purge')({'ignore_auth': True}, {'id': 'testorg'})
         cls._process.terminate()
 
     def setUp(self):
