@@ -20,8 +20,10 @@ With the extension installed and activated:
 
 
 ## Requirements
-This extension has been tested with versions of CKAN from 2.6.3 onwards
-and works well on these versions.
+This extension has been tested with the following versions of CKAN
+and works well on these installations:
+1. CKAN 2.7.0
+2. CKAN 2.6.3
 
 
 ## Installation
