@@ -20,8 +20,11 @@ With the extension installed and activated:
 
 
 ## Requirements
-This extension has been tested with versions of CKAN from 2.6.3 onwards
-and works well on these versions.
+This extension has been tested with the following versions of CKAN
+and works well on these installations:
+1. CKAN 2.7.0
+2. CKAN 2.6.3
+3. CKAN 2.5.4
 
 
 ## Installation
@@ -47,8 +50,10 @@ Modify your configuration file (generally in `/etc/ckan/default/production.ini`)
 
 #### Option 2: Install the extension using `pip install ckanext-social`
 1. Install the ckanext-social Python package into your virtual environment:
+```commandline
+pip install ckanext-social
+```
 
-     pip install ckanext-social
 
 2. Add ``social`` to the ``ckan.plugins`` setting in your CKAN
    config file (by default the config file is located at
@@ -68,3 +73,12 @@ cd ckanext-social
 python setup.py develop
 pip install -r dev-requirements.txt
 ```
+
+### Tests
+
+This sofware contains a set of test to detect errors and failures. You can run this tests by running the following command (this command will generate coverage reports):
+
+```commandline
+python setup.py nosetests
+```
+Note: The test.ini file contains a link to the CKAN test-core.ini file. You will need to change that link to the real path of the file in your system (generally /usr/local/lib/ckan/default/src/ckan/test-core.ini).

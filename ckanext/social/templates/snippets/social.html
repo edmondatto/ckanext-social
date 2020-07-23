@@ -1,10 +1,14 @@
 {% set current_url = h.full_current_url() %}
 {% set pkg = c.pkg_dict %}
+{% set rsc = c.resource %}
 {% set title = h.dataset_display_name(pkg) %}
-{% if title is not string %}
+{% set description = h.markdown_extract(pkg.notes, extract_length=40) %}
+{% if 'resource' in current_url %}
+    {% set title = h.generic_title() %}
+    {% set description = h.resource_display_name(rsc) %}
+{% elif title is not string %}
     {% set title = h.generic_title() %}
 {% endif %}
-{% set description = h.markdown_extract(pkg.notes, extract_length=40) %}
 {% block social %}
   <section class="module module-narrow social">
     {% block social_title %}
